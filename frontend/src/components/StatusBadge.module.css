@@ -1,0 +1,45 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  align-self: flex-start;
+}
+
+.connected {
+  background: #e8f5e9;
+  color: #388e3c;
+  border: 1px solid #a5d6a7;
+}
+
+.disconnected {
+  background: #fff3e0;
+  color: #f57c00;
+  border: 1px solid #ffcc80;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.connected .dot {
+  background: #43a047;
+  box-shadow: 0 0 0 2px rgba(67,160,71,0.25);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.disconnected .dot {
+  background: #f57c00;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
