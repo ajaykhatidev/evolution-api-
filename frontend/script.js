@@ -1,4 +1,4 @@
-const API_URL = 'https://evolution-api-9297.onrender.com'; // CRM backend URL (Render)
+const API_URL = 'http://localhost:3000'; // CRM backend URL (Render)
 
 const sendBtn = document.getElementById('sendBtn');
 const phone = document.getElementById('phone');
@@ -83,4 +83,16 @@ async function fetchMessages() {
 // Initial fetch and periodic refresh
 fetchMessages();
 refreshBtn.addEventListener('click', fetchMessages);
-setInterval(fetchMessages, 5000); // Auto-refresh every 5 seconds
+// setInterval(fetchMessages, 5000); // Polling Removed!
+
+// WebSockets Implementation for Real-Time Updates
+const socket = io(API_URL);
+
+socket.on('connect', () => {
+    console.log('Connected to Real-Time Server via WebSocket');
+});
+
+socket.on('newMessage', (msg) => {
+    console.log('New message received via WebSocket:', msg);
+    fetchMessages(); // Refresh UI instantly
+});

@@ -2,9 +2,9 @@
 
 # Configuration (Replace with your own URLs and Keys)
 # Evolution API is a separate service (not your CRM backend).
-EVO_URL="https://evolution-api-1-qr29.onrender.com"
-API_KEY="your_api_key"
-CRM_BACKEND_URL="https://evolution-api-9297.onrender.com"
+EVO_URL="http://localhost:8080"
+API_KEY="your_secure_api_key"
+CRM_BACKEND_URL="http://crm-backend:3000"
 INSTANCE_NAME="crm_instance"
 
 echo "Step 1: Creating Instance '$INSTANCE_NAME'..."
@@ -22,7 +22,7 @@ curl -X GET "$EVO_URL/instance/connect/$INSTANCE_NAME" \
      -H "apikey: $API_KEY"
 
 echo -e "\n\nStep 3: Setting Webhook to '$CRM_BACKEND_URL'..."
-curl -X POST "$EVO_URL/webhook/instance" \
+curl -X POST "$EVO_URL/webhook/set/$INSTANCE_NAME" \
      -H "Content-Type: application/json" \
      -H "apikey: $API_KEY" \
      -d "{

@@ -4,19 +4,56 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config();
 
+const http = require('http');
+const { Server } = require('socket.io');
+
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*", // Allow frontend to connect
+        methods: ["GET", "POST"]
+    }
+});
+
+const conversationFlow = require('./bot'); // Import our auto-reply bot logic
+
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
 
+// Socket.io Connection Logic
+io.on('connection', (socket) => {
+    console.log(`Frontend Connected: ${socket.id}`);
+});
+
 // In-memory message store
 let messages = [];
 
 // Environment Variables
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
-const AUTHENTICATION_API_KEY = process.env.AUTHENTICATION_API_KEY;
-const EVOLUTION_INSTANCE_NAME = process.env.EVOLUTION_INSTANCE_NAME || 'crm_instance';
+const EVO_URL = process.env.EVO_URL || 'http://localhost:8080';
+const API_KEY = process.env.API_KEY || 'your_secure_api_key';
+const EVOLUTION_INSTANCE_NAME = 'crm_instance';
+
+// Reusable function to send WhatsApp via Evolution API
+async function sendWhatsAppMessage(number, message) {
+    const url = `${EVO_URL}/message/sendText/${EVOLUTION_INSTANCE_NAME}`;
+    return axios.post(url, {
+        number: number,
+        options: {
+            delay: 1500, // natural typing delay
+            presence: "composing",
+            linkPreview: false
+        },
+        textMessage: { text: message }
+    }, {
+        headers: {
+            'apikey': API_KEY,
+            'Content-Type': 'application/json'
+        }
+    });
+}
 
 app.get('/', (req, res) => {
     res.send('CRM Backend for WhatsApp (Evolution API) is running!');
@@ -40,7 +77,7 @@ app.post('/webhook/whatsapp', (req, res) => {
     if (event === 'messages.upsert' && data.key && !data.key.fromMe) {
         const newMessage = {
             id: data.key.id,
-            from: data.sender || data.key.remoteJid,
+            from: req.body.sender || data.key.remoteJid, // Fix to get correct WhatsApp number
             content: data.message?.conversation || data.message?.extendedTextMessage?.text || 'Media Message/Other',
             timestamp: new Date().toLocaleTimeString(),
             isMine: false
@@ -48,6 +85,36 @@ app.post('/webhook/whatsapp', (req, res) => {
         
         messages.push(newMessage);
         console.log(`New message from ${newMessage.from}: ${newMessage.content}`);
+        
+        // Push update to frontend real-time
+        io.emit('newMessage', newMessage);
+
+        // --- AUTOMATED BOT REPLY LOGIC ---
+        const userText = newMessage.content.toLowerCase().trim();
+        const replyText = conversationFlow[userText] || conversationFlow["default"];
+
+        console.log(`Bot replying to ${newMessage.from}: ${replyText}`);
+
+        setTimeout(async () => {
+            try {
+                const sendRes = await sendWhatsAppMessage(newMessage.from, replyText);
+                
+                const botMessage = {
+                    id: sendRes.data.key?.id || Date.now().toString(),
+                    from: 'bot',
+                    to: newMessage.from,
+                    content: replyText,
+                    timestamp: new Date().toLocaleTimeString(),
+                    isMine: true
+                };
+                
+                messages.push(botMessage);
+                io.emit('newMessage', botMessage);
+
+            } catch (error) {
+                console.error('Bot Auto-Reply error:', error.message);
+            }
+        }, 3000); // 3 seconds delay to reply naturally
     }
 
     res.status(200).send('Webhook processed');
@@ -67,36 +134,24 @@ app.post('/send-message', async (req, res) => {
 
     setTimeout(async () => {
         try {
-            const url = `https://evolution-api-1-qr29.onrender.com/message/sendText/${EVOLUTION_INSTANCE_NAME}`;
-            
-            const response = await axios.post(url, {
-                number: number,
-                options: {
-                    delay: 1200,
-                    presence: "composing",
-                    linkPreview: false
-                },
-                textMessage: {
-                    text: message
-                }
-            }, {
-                headers: {
-                    'apikey': AUTHENTICATION_API_KEY,
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await sendWhatsAppMessage(number, message);
 
             console.log('Evolution API Response:', response.data);
             
-            // Add to local message list for UI
-            messages.push({
+            const sentMessage = {
                 id: response.data.key?.id || Date.now().toString(),
                 from: 'me',
                 to: number,
                 content: message,
                 timestamp: new Date().toLocaleTimeString(),
                 isMine: true
-            });
+            };
+            
+            // Add to local message list for UI
+            messages.push(sentMessage);
+
+            // Push update to frontend real-time
+            io.emit('newMessage', sentMessage);
 
             res.json({ success: true, response: response.data });
 
@@ -110,6 +165,6 @@ app.post('/send-message', async (req, res) => {
     }, delay);
 });
 
-app.listen(PORT, () => {
-    console.log(`CRM Backend listening on port ${PORT}`);
+server.listen(PORT, () => {
+    console.log(`CRM Backend listening on port ${PORT} with WebSockets enabled`);
 });

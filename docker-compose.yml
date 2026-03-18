@@ -1,10 +1,12 @@
 services:
-  # 1. Evolution API Engine
+  # 1. Evolution API Engine (Stable v1.x for simple local storage)
   evolution-api:
-    image: atendai/evolution-api:latest
+    image: atendai/evolution-api:v1.8.2
     container_name: evolution-api-container
     ports:
       - "8080:8080"
+    volumes:
+      - ./evolution_data:/evolution/instances # Persist your WhatsApp sessions
     environment:
       - SERVER_TYPE=http
       - SERVER_PORT=8080
@@ -12,6 +14,7 @@ services:
       - AUTHENTICATION_API_KEY=your_secure_api_key
       - LOG_LEVEL=ERROR
       - STORE_MESSAGES=true
+      - DATABASE_ENABLED=false # Use local file storage instead of Postgres/MySQL
     restart: always
 
   # 2. Your CRM Backend
@@ -26,4 +29,14 @@ services:
       - PORT=3000
     depends_on:
       - evolution-api
+    restart: always
+
+  # 3. CRM Frontend Web Dashboard
+  frontend:
+    build: ./frontend
+    container_name: frontend-container
+    ports:
+      - "80:80"
+    depends_on:
+      - crm-backend
     restart: always
