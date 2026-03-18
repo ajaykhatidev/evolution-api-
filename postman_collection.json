@@ -1,0 +1,93 @@
+{
+	"info": {
+		"_postman_id": "848bd48e-5b12-4c22-9594-5582f3c054e7",
+		"name": "Evolution API & CRM Demo",
+		"description": "Collection for testing Evolution API and CRM Backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CRM Backend - Send Message",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"number\": \"919876543210\",\n    \"message\": \"Hello from Postman!\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/send-message",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"send-message"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CRM Backend - Get Messages",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/messages",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"messages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Evolution API - Create Instance",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "apikey",
+						"value": "your_authentication_api_key",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"instanceName\": \"crm_instance\",\n    \"token\": \"some_token\",\n    \"qrcode\": true,\n    \"number\": \"\",\n    \"webhook_enabled\": true,\n    \"webhook_url\": \"https://your-crm-backend.onrender.com/webhook/whatsapp\"\n}"
+				},
+				"url": {
+					"raw": "https://your-evolution-api.onrender.com/instance/create",
+					"protocol": "https",
+					"host": [
+						"your-evolution-api",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"instance",
+						"create"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

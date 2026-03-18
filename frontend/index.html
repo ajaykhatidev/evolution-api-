@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp CRM Demo - Evolution API</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>WhatsApp CRM</h1>
+            <p>Using Evolution API Integration</p>
+        </header>
+
+        <section class="send-message">
+            <h2>Send New Message</h2>
+            <form id="sendForm">
+                <input type="text" id="phone" placeholder="Phone Number (e.g. 919876543210)" required>
+                <textarea id="message" placeholder="Type your message here..." required></textarea>
+                <button type="submit" id="sendBtn">Send Message</button>
+            </form>
+            <div id="statusMessage"></div>
+        </section>
+
+        <section class="messages-log">
+            <h2>Activity Log</h2>
+            <div class="log-container" id="messageLog">
+                <p class="empty-msg">No messages received yet.</p>
+            </div>
+            <button id="refreshBtn">Refresh Messages</button>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
