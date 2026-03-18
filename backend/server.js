@@ -67,17 +67,27 @@ app.get('/messages', (req, res) => {
 // Webhook endpoint to receive data from Evolution API
 app.post('/webhook/whatsapp', (req, res) => {
     console.log('--- Webhook Received ---');
-    console.log(JSON.stringify(req.body, null, 2));
-
-    const event = req.body.event; // e.g., 'messages.upsert'
+    const event = req.body.event;
     const data = req.body.data;
 
-    // Based on Evolution API webhook structure (Baileys)
-    // event: "messages.upsert", "messages.update", etc.
     if (event === 'messages.upsert' && data.key && !data.key.fromMe) {
+        console.log('--- Checking for sender number ---');
+        console.log('RemoteJid:', data.key.remoteJid);
+        console.log('PushName:', data.pushName);
+
+        // SOURCE OF TRUTH: Evolution API often puts the true number in 'sender' field of the root
+        // or we use remoteJid. Let's try to be smart.
+        let senderNumber = data.key.remoteJid;
+        
+        const OWNER_JID = '917300733744@s.whatsapp.net';
+        if (senderNumber === OWNER_JID) {
+            console.log('⚠️ Skipping reply to instance owner.');
+            return res.status(200).send('Ignored owner message');
+        }
+
         const newMessage = {
             id: data.key.id,
-            from: req.body.sender || data.key.remoteJid, // Fix to get correct WhatsApp number
+            from: senderNumber,
             content: data.message?.conversation || data.message?.extendedTextMessage?.text || 'Media Message/Other',
             timestamp: new Date().toLocaleTimeString(),
             isMine: false
@@ -85,24 +95,29 @@ app.post('/webhook/whatsapp', (req, res) => {
         
         messages.push(newMessage);
         console.log(`New message from ${newMessage.from}: ${newMessage.content}`);
-        
-        // Push update to frontend real-time
         io.emit('newMessage', newMessage);
 
         // --- AUTOMATED BOT REPLY LOGIC ---
         const userText = newMessage.content.toLowerCase().trim();
         const replyText = conversationFlow[userText] || conversationFlow["default"];
 
-        console.log(`Bot replying to ${newMessage.from}: ${replyText}`);
-
         setTimeout(async () => {
             try {
-                const sendRes = await sendWhatsAppMessage(newMessage.from, replyText);
+                console.log(`--- Bot attempting to send reply to ${senderNumber} ---`);
                 
+                // Always extract just the number/ID part before the '@'
+                // This handles both regular numbers (@s.whatsapp.net) and LIDs (@lid)
+                const targetNumber = senderNumber.split('@')[0];
+                console.log(`Using target: ${targetNumber}`);
+
+                const sendRes = await sendWhatsAppMessage(targetNumber, replyText);
+                
+                console.log('Bot Send Response success:', sendRes.data?.key?.id);
+
                 const botMessage = {
-                    id: sendRes.data.key?.id || Date.now().toString(),
+                    id: sendRes.data?.key?.id || `bot-${Date.now()}`,
                     from: 'bot',
-                    to: newMessage.from,
+                    to: senderNumber,
                     content: replyText,
                     timestamp: new Date().toLocaleTimeString(),
                     isMine: true
@@ -110,11 +125,15 @@ app.post('/webhook/whatsapp', (req, res) => {
                 
                 messages.push(botMessage);
                 io.emit('newMessage', botMessage);
+                console.log(`✅ Bot reply sent successfully to ${senderNumber}`);
 
             } catch (error) {
-                console.error('Bot Auto-Reply error:', error.message);
+                console.error('❌ Bot Auto-Reply error:', JSON.stringify(error.response?.data || error.message, null, 2));
+                
+                // If the digits-only fails for LID, some instances expect the full @lid suffix 
+                // OR might not support LID replies without additional Baileys config.
             }
-        }, 3000); // 3 seconds delay to reply naturally
+        }, 3000);
     }
 
     res.status(200).send('Webhook processed');

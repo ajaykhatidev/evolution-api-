@@ -1,7 +1,7 @@
 services:
-  # 1. Evolution API Engine (Stable v1.x for simple local storage)
+  # 1. Evolution API Engine (v2.x Stable)
   evolution-api:
-    image: atendai/evolution-api:v1.8.2
+    image: atendai/evolution-api:v2.1.1
     container_name: evolution-api-container
     ports:
       - "8080:8080"
@@ -14,7 +14,7 @@ services:
       - AUTHENTICATION_API_KEY=your_secure_api_key
       - LOG_LEVEL=ERROR
       - STORE_MESSAGES=true
-      - DATABASE_ENABLED=false # Use local file storage instead of Postgres/MySQL
+      - DATABASE_ENABLED=false
     restart: always
 
   # 2. Your CRM Backend
