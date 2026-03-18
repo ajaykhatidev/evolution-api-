@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000'; // Change to CRM backend URL after deployment
+const API_URL = 'https://evolution-api-9297.onrender.com'; // CRM backend URL (Render)
 
 const sendBtn = document.getElementById('sendBtn');
 const phone = document.getElementById('phone');

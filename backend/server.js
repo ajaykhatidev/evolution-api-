@@ -67,7 +67,7 @@ app.post('/send-message', async (req, res) => {
 
     setTimeout(async () => {
         try {
-            const url = `${EVOLUTION_API_URL}/message/sendText/${EVOLUTION_INSTANCE_NAME}`;
+            const url = `https://evolution-api-1-qr29.onrender.com/message/sendText/${EVOLUTION_INSTANCE_NAME}`;
             
             const response = await axios.post(url, {
                 number: number,
