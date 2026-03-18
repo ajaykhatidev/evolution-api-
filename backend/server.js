@@ -3,6 +3,13 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config();
+const { createClient } = require('@supabase/supabase-js');
+
+// Initialize Supabase Client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY; // Using service role key for backend
+const supabase = createClient(supabaseUrl, supabaseKey);
+console.log('✅ Supabase Client Initialized');
 
 const http = require('http');
 const { Server } = require('socket.io');

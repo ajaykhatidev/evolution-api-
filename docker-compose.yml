@@ -1,12 +1,33 @@
+version: '3.9'
+
 services:
-  # 1. Evolution API Engine (v2.x Stable)
+  # 0. Local PostgreSQL (for Evolution API)
+  db:
+    image: postgres:15
+    container_name: whatsapp-crm-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - evolution_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: always
+
+  # 1. Evolution API Engine
   evolution-api:
     image: atendai/evolution-api:v2.1.1
     container_name: evolution-api-container
     ports:
       - "8080:8080"
     volumes:
-      - ./evolution_data:/evolution/instances # Persist your WhatsApp sessions
+      - ./evolution_data:/evolution/instances
     environment:
       - SERVER_TYPE=http
       - SERVER_PORT=8080
@@ -14,10 +35,23 @@ services:
       - AUTHENTICATION_API_KEY=your_secure_api_key
       - LOG_LEVEL=ERROR
       - STORE_MESSAGES=true
-      - DATABASE_ENABLED=false
+      - DATABASE_ENABLED=true
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_CONNECTION_URI=postgresql://postgres:postgres@db:5432/postgres?sslmode=disable
+      # --- S3 Storage (For Media files - Optional) ---
+      - S3_ENABLED=true
+      - S3_ACCESS_KEY=your_access_key
+      - S3_SECRET_KEY=your_secret_key
+      - S3_BUCKET=evolution
+      - S3_PORT=443
+      - S3_ENDPOINT=https://wpgvqolookvoljazmqik.supabase.co/storage/v1/s3
+      - S3_REGION=us-east-1
+    depends_on:
+      db:
+        condition: service_healthy
     restart: always
 
-  # 2. Your CRM Backend
+  # 2. CRM Backend
   crm-backend:
     build: ./backend
     container_name: crm-backend-container
@@ -31,7 +65,7 @@ services:
       - evolution-api
     restart: always
 
-  # 3. CRM Frontend Web Dashboard
+  # 3. CRM Frontend
   frontend:
     build: ./frontend
     container_name: frontend-container
@@ -40,3 +74,6 @@ services:
     depends_on:
       - crm-backend
     restart: always
+
+volumes:
+  evolution_pgdata:
