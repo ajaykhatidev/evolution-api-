@@ -15,6 +15,8 @@ function App() {
   const [messages, setMessages] = useState([])
   const [isConnected, setIsConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [whatsappStatus, setWhatsappStatus] = useState('disconnected')
+  const [whatsappQr, setWhatsappQr] = useState(null)
 
   const fetchMessages = useCallback(async () => {
     try {
@@ -46,15 +48,32 @@ function App() {
       fetchMessages()
     })
 
+    socket.on('statusUpdate', (state) => {
+      console.log('📶 WhatsApp Status update:', state);
+      setWhatsappStatus(state);
+      if (state === 'open') setWhatsappQr(null); // Clear QR if connected
+    })
+
+    socket.on('qrUpdate', (qr) => {
+      console.log('🖼️ New QR received via Socket');
+      setWhatsappQr(qr);
+    })
+
     return () => {
-      socket?.disconnect()
+      socket?.off('statusUpdate');
+      socket?.off('qrUpdate');
+      socket?.disconnect();
     }
   }, [fetchMessages])
 
   return (
     <div className={styles.appContainer}>
       <aside className={styles.sidebarSection}>
-        <Sidebar apiUrl={API_URL} />
+        <Sidebar 
+          apiUrl={API_URL} 
+          status={whatsappStatus}
+          qrCode={whatsappQr}
+        />
       </aside>
       <div className={styles.mainContent}>
         <Header />
