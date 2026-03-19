@@ -4,42 +4,38 @@
   gap: 8px;
   padding: 6px 14px;
   border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.2px;
-  align-self: flex-start;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  width: fit-content;
 }
 
 .connected {
-  background: #e8f5e9;
-  color: #388e3c;
-  border: 1px solid #a5d6a7;
+  background-color: #f0fdf4;
+  color: #166534;
+  border-color: #dcfce7;
 }
 
 .disconnected {
-  background: #fff3e0;
-  color: #f57c00;
-  border: 1px solid #ffcc80;
+  background-color: #fef2f2;
+  color: #991b1b;
+  border-color: #fee2e2;
 }
 
 .dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  display: inline-block;
+  background-color: currentColor;
+  box-shadow: 0 0 0 4px rgba(currentColor, 0.1);
 }
 
 .connected .dot {
-  background: #43a047;
-  box-shadow: 0 0 0 2px rgba(67,160,71,0.25);
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-.disconnected .dot {
-  background: #f57c00;
+  animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
 }

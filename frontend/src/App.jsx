@@ -4,6 +4,7 @@ import Header from './components/Header'
 import SendMessage from './components/SendMessage'
 import ActivityLog from './components/ActivityLog'
 import StatusBadge from './components/StatusBadge'
+import Sidebar from './components/Sidebar'
 import styles from './App.module.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
@@ -51,21 +52,33 @@ function App() {
   }, [fetchMessages])
 
   return (
-    <div className={styles.app}>
-      <Header />
-      <main className={styles.main}>
-        <StatusBadge isConnected={isConnected} />
-        <SendMessage
-          apiUrl={API_URL}
-          onMessageSent={fetchMessages}
-          isLoading={isLoading}
-          setIsLoading={setIsLoading}
-        />
-        <ActivityLog
-          messages={messages}
-          onRefresh={fetchMessages}
-        />
-      </main>
+    <div className={styles.appContainer}>
+      <aside className={styles.sidebarSection}>
+        <Sidebar apiUrl={API_URL} />
+      </aside>
+      <div className={styles.mainContent}>
+        <Header />
+        <main className={styles.main}>
+          <StatusBadge isConnected={isConnected} />
+          <div className={styles.dashboardGrid}>
+            <div className={styles.sendSection}>
+              <SendMessage
+                apiUrl={API_URL}
+                onMessageSent={fetchMessages}
+                isLoading={isLoading}
+                setIsLoading={setIsLoading}
+              />
+            </div>
+            <div className={styles.chatSection}>
+              <ActivityLog
+                messages={messages}
+                onRefresh={fetchMessages}
+                apiUrl={API_URL}
+              />
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   )
 }

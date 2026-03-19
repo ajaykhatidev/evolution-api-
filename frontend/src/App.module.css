@@ -1,13 +1,55 @@
-.app {
-  min-height: 100vh;
+.appContainer {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: #f0f2f5;
+}
+
+.sidebarSection {
+  flex-shrink: 0;
+}
+
+.mainContent {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background: linear-gradient(135deg, #f0f2f5 0%, #e8f5e9 100%);
 }
 
 .main {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 20px 16px 40px;
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.dashboardGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .dashboardGrid {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .sendSection {
+    width: 400px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+  }
+
+  .chatSection {
+    flex-grow: 1;
+  }
 }
