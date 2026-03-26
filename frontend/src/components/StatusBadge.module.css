@@ -2,24 +2,25 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  border: 1px solid transparent;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid #e9edef;
   width: fit-content;
+  margin: 8px 16px;
+  align-self: flex-start;
+  background-color: #f7f8f9;
 }
 
 .connected {
-  background-color: #f0fdf4;
-  color: #166534;
-  border-color: #dcfce7;
+  color: #0b6156;
+  border-color: #cde7e2;
 }
 
 .disconnected {
-  background-color: #fef2f2;
-  color: #991b1b;
-  border-color: #fee2e2;
+  color: #8b1c1c;
+  border-color: #f3d2d2;
 }
 
 .dot {

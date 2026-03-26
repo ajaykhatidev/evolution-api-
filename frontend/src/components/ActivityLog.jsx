@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './ActivityLog.module.css';
 
-function MessageItem({ msg, onReply }) {
+function MessageItem({ msg, onSelect }) {
   const isSent = msg.isMine;
+  const senderLabel = msg.contact || msg.from;
+  const sentLabel = msg.contact || msg.to;
   
   let timeStr = msg.timestamp;
   try {
@@ -16,11 +18,28 @@ function MessageItem({ msg, onReply }) {
 
   return (
     <div className={`${styles.messageWrapper} ${isSent ? styles.sentWrapper : styles.receivedWrapper}`}>
-      <div className={`${styles.bubble} ${isSent ? styles.sentBubble : styles.receivedBubble}`}>
+      <div
+        className={`${styles.bubble} ${isSent ? styles.sentBubble : styles.receivedBubble}`}
+        onClick={() => onSelect(msg)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') onSelect(msg);
+        }}
+        title="Click to reply to this contact"
+      >
         {!isSent && (
           <div className={styles.bubbleHeader}>
-            <div className={styles.sender}>{msg.from}</div>
-            <button className={styles.replyMiniBtn} onClick={() => onReply(msg.from)} title="Reply">
+            <div className={styles.sender}>{msg.pushName || msg.from}</div>
+            <button className={styles.replyMiniBtn} onClick={() => onSelect(msg)} title="Reply">
+              ↩️
+            </button>
+          </div>
+        )}
+        {isSent && sentLabel && (
+          <div className={styles.bubbleHeader}>
+            <div className={styles.sender}>To: {sentLabel}</div>
+            <button className={styles.replyMiniBtn} onClick={() => onSelect(msg)} title="Reply">
               ↩️
             </button>
           </div>
@@ -35,7 +54,7 @@ function MessageItem({ msg, onReply }) {
   );
 }
 
-export default function ActivityLog({ messages, onRefresh, apiUrl }) {
+export default function ActivityLog({ messages, onRefresh, apiUrl, activeContact, activeName }) {
   const scrollRef = useRef(null);
   const [replyText, setReplyText] = useState('');
   const [targetPhone, setTargetPhone] = useState('');
@@ -49,15 +68,15 @@ export default function ActivityLog({ messages, onRefresh, apiUrl }) {
 
   // Default target phone to the last received message
   useEffect(() => {
-    const lastReceived = [...messages].reverse().find(m => !m.isMine);
-    if (lastReceived && !targetPhone) {
-      setTargetPhone(lastReceived.from.split('@')[0]);
+    if (activeContact) {
+      setTargetPhone(activeContact);
     }
-  }, [messages]);
+  }, [activeContact]);
 
-  const handleReplyClick = (from) => {
-    setTargetPhone(from.split('@')[0]);
-    // Focus the input? (optional)
+  const handleSelectMessage = (msg) => {
+    const raw = msg.isMine ? msg.to : msg.from;
+    // VERY IMPORTANT: Keep @lid and @g.us for non-standard IDs to avoid @s.whatsapp.net fallback
+    if (raw) setTargetPhone((raw.includes('@lid') || raw.includes('@g.us')) ? raw : raw.split('@')[0]);
   };
 
   const handleSendReply = async (e) => {
@@ -88,7 +107,7 @@ export default function ActivityLog({ messages, onRefresh, apiUrl }) {
         <div className={styles.headerInfo}>
           <div className={styles.avatar}>💬</div>
           <div>
-            <h2 className={styles.headerTitle}>Live Chat Feed</h2>
+            <h2 className={styles.headerTitle}>{activeName || activeContact || 'Select a chat'}</h2>
             <span className={styles.headerSubtitle}>
               {messages.length} message{messages.length !== 1 ? 's' : ''}
             </span>
@@ -103,13 +122,13 @@ export default function ActivityLog({ messages, onRefresh, apiUrl }) {
         {messages.length === 0 ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>💬</div>
-            <h3>Waiting for messages...</h3>
-            <p>Scanning for incoming activity from Evolution API</p>
+            <h3>{activeContact ? 'No messages yet' : 'Select a client from the left'}</h3>
+            <p>{activeContact ? 'Start a conversation below.' : 'Choose a chat to manage messages.'}</p>
           </div>
         ) : (
           <div className={styles.messageList}>
             {messages.map((msg, i) => (
-              <MessageItem key={msg.id || i} msg={msg} onReply={handleReplyClick} />
+              <MessageItem key={msg.id || i} msg={msg} onSelect={handleSelectMessage} />
             ))}
           </div>
         )}

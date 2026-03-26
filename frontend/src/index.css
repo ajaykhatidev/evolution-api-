@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
 
 :root {
   --primary: #25d366;
@@ -25,8 +25,8 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: var(--bg);
+  font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  background: linear-gradient(180deg, #00a884 0 120px, #d9dbd5 120px 100%);
   color: var(--text-primary);
   margin: 0;
   padding: 0;

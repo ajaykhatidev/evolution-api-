@@ -1,29 +1,10 @@
-version: '3.9'
-
 services:
-  # 0. Local PostgreSQL (for Evolution API)
-  db:
-    image: postgres:15
-    container_name: whatsapp-crm-postgres
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - evolution_pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    restart: always
-
-  # 1. Evolution API Engine
+  # 1. Evolution API Engine (Using MongoDB Atlas)
   evolution-api:
-    image: atendai/evolution-api:v2.1.1
+    image: atendai/evolution-api:v1.8.7
+    platform: linux/amd64
     container_name: evolution-api-container
+    restart: always
     ports:
       - "8080:8080"
     volumes:
@@ -33,10 +14,6 @@ services:
       - ./evolution.env
     environment:
       - DOCKER_ENV=true
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: always
 
   # 2. CRM Backend
   crm-backend:
@@ -44,6 +21,8 @@ services:
     container_name: crm-backend-container
     ports:
       - "3000:3000"
+    env_file:
+      - ./backend/.env
     environment:
       - EVO_URL=http://evolution-api:8080
       - API_KEY=your_secure_api_key
@@ -54,13 +33,13 @@ services:
 
   # 3. CRM Frontend
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      args:
+        - VITE_API_URL=http://localhost:3000
     container_name: frontend-container
     ports:
-      - "80:80"
+      - "5173:80"
     depends_on:
       - crm-backend
     restart: always
-
-volumes:
-  evolution_pgdata:

@@ -1,15 +1,12 @@
 .header {
-  background: linear-gradient(135deg, #075e54 0%, #00a884 100%);
+  background: #f0f2f5;
   padding: 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  border-bottom: 1px solid #d1d7db;
   width: 100%;
 }
 
 .inner {
-  padding: 16px 24px;
+  padding: 12px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -22,23 +19,22 @@
 }
 
 .icon {
-  font-size: 32px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  font-size: 24px;
 }
 
 .title {
   margin: 0;
-  color: #ffffff;
-  font-size: 1.5rem;
+  color: #111b21;
+  font-size: 1.05rem;
   font-weight: 700;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.01em;
 }
 
 .subtitle {
   margin: 0;
-  color: rgba(255,255,255,0.8);
-  font-size: 0.75rem;
-  font-weight: 500;
+  color: #667781;
+  font-size: 0.7rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }

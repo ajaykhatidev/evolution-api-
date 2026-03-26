@@ -1,9 +1,12 @@
 .appContainer {
   display: flex;
-  height: 100vh;
-  width: 100vw;
+  height: calc(100vh - 40px);
+  width: min(1500px, 100%);
+  margin: 20px auto;
   overflow: hidden;
   background-color: #f0f2f5;
+  border-radius: 16px;
+  box-shadow: 0 18px 48px rgba(0,0,0,0.18);
 }
 
 .sidebarSection {
@@ -15,41 +18,293 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: linear-gradient(135deg, #f0f2f5 0%, #e8f5e9 100%);
+  background-color: #efeae2;
 }
 
 .main {
   flex-grow: 1;
-  padding: 20px;
-  overflow-y: auto;
+  padding: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 0;
 }
 
 .dashboardGrid {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
+  flex-direction: row;
+  gap: 0;
   width: 100%;
+  height: 100%;
+  min-height: 0;
 }
 
-@media (min-width: 1024px) {
+.leftRail {
+  width: 64px;
+  background-color: #ffffff;
+  border-right: 1px solid #d1d7db;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 8px;
+  gap: 12px;
+}
+
+.railLogo {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #00a884;
+  color: white;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.railBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: none;
+  background: #f0f2f5;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #54656f;
+}
+
+.railBtn:hover {
+  background: #e6eaee;
+}
+
+.railBtnActive {
+  background: #00a884 !important;
+  color: white !important;
+}
+
+.railSpacer {
+  flex-grow: 1;
+}
+
+.listPanel {
+  width: 360px;
+  border-right: 1px solid #d1d7db;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.listHeader {
+  padding: 16px;
+  border-bottom: 1px solid #e9edef;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.listTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.listBadge {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4ade80;
+  display: inline-block;
+}
+
+.listHeading {
+  font-weight: 700;
+  color: #111b21;
+}
+
+.listSub {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+.searchBox {
+  margin: 0 16px 12px;
+  background: #f0f2f5;
+  border-radius: 999px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.searchIcon {
+  font-size: 0.85rem;
+  color: #667781;
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.newChatRow {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 12px;
+}
+
+.newChatInput {
+  flex-grow: 1;
+  border: 1px solid #e9edef;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+}
+
+.newChatBtn {
+  border: none;
+  background: #00a884;
+  color: white;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chatList {
+  overflow-y: auto;
+  padding: 4px 0 16px;
+  min-height: 0;
+}
+
+.chatItem {
+  width: 100%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.chatItem:hover {
+  background: #f6f7f8;
+}
+
+.chatItemActive {
+  background: #edf2f7;
+}
+
+.chatAvatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: #f0f2f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #111b21;
+}
+
+.chatMeta {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.chatTopRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chatName {
+  font-weight: 700;
+  color: #111b21;
+  font-size: 0.9rem;
+}
+
+.chatTime {
+  font-size: 0.7rem;
+  color: #8696a0;
+  flex-shrink: 0;
+}
+
+.chatPreview {
+  font-size: 0.8rem;
+  color: #667781;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.unread {
+  background: #00a884;
+  color: white;
+  font-size: 0.7rem;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.emptyList {
+  padding: 20px;
+  color: #8696a0;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.chatSection {
+  flex-grow: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.centerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 20px;
+}
+
+@media (max-width: 1023px) {
+  .appContainer {
+    height: 100vh;
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
+
   .dashboardGrid {
+    flex-direction: column;
+  }
+
+  .leftRail {
     flex-direction: row;
-    align-items: flex-start;
+    width: 100%;
+    height: 56px;
+    border-right: none;
+    border-bottom: 1px solid #d1d7db;
   }
 
-  .sendSection {
-    width: 400px;
-    flex-shrink: 0;
-    position: sticky;
-    top: 0;
-  }
-
-  .chatSection {
-    flex-grow: 1;
+  .listPanel {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #d1d7db;
+    max-height: 45vh;
   }
 }
